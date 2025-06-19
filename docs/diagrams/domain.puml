@@ -1,0 +1,81 @@
+@startuml Domain-Driven Design
+title Diagramme du modèle de domaine du système de caisse
+skinparam BackgroundColor transparent
+skinparam hideEmptyMembers true
+
+set namespaceSeparator .
+
+package src.user{
+    class User{
+        id : UUID
+        name : str
+    }   
+}
+
+database src.database{
+    class Database{
+        products: List<Product>
+        sales: List<Sale>
+        returns: List<Return>
+    }
+}
+
+package src.product{
+
+    class Product{
+        id: UUID
+        name: str
+        category: str
+        unit_price: float
+        stock_quantity: int
+        state: str
+    }
+
+    class Category{
+        name: str
+        description: str
+    }
+}
+
+package src.sale{
+    class Sale{
+        id: UUID
+        sale_date: datetime
+        sale_lines: List<SaleLine>
+        total: float
+    }
+
+    class SaleLine{
+        product_id: UUID
+        quantity: int
+        total_price: float
+    }
+}
+
+package src.return{
+    class Return{
+        id: UUID
+        return_date: datetime
+        original_sale: Sale
+        return_lines: List<ReturnLine>
+    }
+
+    class ReturnLine{
+        product_id: UUID
+        quantity: int
+        reason: str
+    }
+}
+
+
+Product -left- Category : belongs to >
+Return -- ReturnLine : contient >
+Return -- Sale : réfère >
+Sale -- SaleLine : contient >
+User -- Database : interagit >
+Product -down- Database : stocke <
+Sale -right- Database : stocke <
+User -- Sale : enregistre >
+User -left- Return : enregistre >
+User -- Product : recherche >
+@enduml

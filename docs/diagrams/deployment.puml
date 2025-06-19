@@ -1,0 +1,22 @@
+@startuml
+node "Machine locale" {
+    node "App Console" {
+        [interface_utilisateur] as ui
+        [controllers] as ctrl
+        [services] as svc
+        [domain_model] as dm
+    }
+
+    node "Base de données" {
+        [SQLite / PostgreSQL] as db
+    }
+
+    [ORM (SQLAlchemy)] as orm
+    orm --> db
+
+    ui --> ctrl
+    ctrl --> svc
+    svc --> dm
+    dm --> orm
+}
+@enduml

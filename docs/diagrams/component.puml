@@ -1,0 +1,35 @@
+@startuml Component Diagramme
+title Diagramme de composants du système de caisse
+skinparam BackgroundColor transparent
+
+package "app.console" {
+    [main.py] --> [interface_utilisateur]
+}
+
+package "app.controller" {
+    [vente_controller] --> [vente_service]
+    [produit_controller] --> [produit_service]
+    [retour_controller] --> [retour_service]
+}
+
+package "app.service" {
+    [vente_service] --> [vente_repository]
+    [produit_service] --> [produit_repository]
+    [retour_service] --> [retour_repository]
+}
+
+package "domaine" {
+    [Produit]
+    [Vente]
+    [Retour]
+    [Employe]
+}
+
+package "infra" {
+    [ORM : SQLAlchemy]
+    [BaseDeDonnees : SQLite/PostgreSQL]
+}
+
+[vente_repository] --> [ORM]
+[ORM] --> [BaseDeDonnees]
+@enduml

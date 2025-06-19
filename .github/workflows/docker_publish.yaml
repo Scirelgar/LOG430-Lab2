@@ -1,0 +1,22 @@
+name: Docker Build/Publish
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  docker-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: scirelgar/log430-fastapi:lab1

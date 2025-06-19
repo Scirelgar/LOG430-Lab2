@@ -1,0 +1,4 @@
+# Dockerignore
+
+*.pyc
+__pycache__/

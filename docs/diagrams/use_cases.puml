@@ -1,0 +1,19 @@
+@startuml Use Cases
+
+title Diagramme des cas d'utilisation du système de caisse
+left to right direction
+skinparam backgroundColor transparent
+actor Employe as "Employé"
+
+rectangle "Système de Caisse" {
+    usecase "Effectuer un retour" as CU4 <<CU4>>
+    usecase "Enregistrer une vente" as CU3 <<CU3>>
+    usecase "Consulter l’état du stock" as CU2 <<CU2>>
+    usecase "Rechercher un produit" as CU1 <<CU1>>
+}
+
+Employe --> CU1
+Employe --> CU2
+Employe --> CU3
+Employe --> CU4
+@enduml

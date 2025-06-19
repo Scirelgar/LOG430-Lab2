@@ -1,0 +1,82 @@
+@startuml
+actor Employe
+participant "interface_utilisateur" as IU
+participant "produit_controller" as PC
+participant "produit_service" as PS
+participant "produit_repository" as PR
+database "BaseDeDonnees"
+
+Employe -> IU : rechercher_produit(critère)
+IU -> PC : rechercher(critère)
+PC -> PS : trouver_produits(critère)
+PS -> PR : find_by(critère)
+PR -> BaseDeDonnees : SELECT * FROM produits WHERE ...
+BaseDeDonnees --> PR : produits[]
+PR --> PS : produits[]
+PS --> PC : produits[]
+PC --> IU : afficher_resultats(produits)
+@enduml
+
+@startuml
+actor Employe
+participant "interface_utilisateur" as IU
+participant "produit_controller" as PC
+participant "produit_service" as PS
+participant "produit_repository" as PR
+database "BaseDeDonnees"
+
+Employe -> IU : consulter_stock()
+IU -> PC : lister_produits()
+PC -> PS : get_all()
+PS -> PR : find_all()
+PR -> BaseDeDonnees : SELECT * FROM produits
+BaseDeDonnees --> PR : produits[]
+PR --> PS : produits[]
+PS --> PC : produits[]
+PC --> IU : afficher(produits)
+@enduml
+
+
+@startuml
+actor Employe
+participant "interface_utilisateur" as IU
+participant "vente_controller" as VC
+participant "vente_service" as VS
+participant "vente_repository" as VR
+database "BaseDeDonnees"
+
+Employe -> IU : enregistrer_vente(produits, quantités)
+IU -> VC : creer_vente(produits, quantités)
+VC -> VS : valider_et_creer_vente()
+VS -> VR : enregistrer(vente, lignes)
+VR -> BaseDeDonnees : BEGIN TRANSACTION
+VR -> BaseDeDonnees : INSERT INTO ventes(...)
+VR -> BaseDeDonnees : INSERT INTO lignes_vente(...)
+VR -> BaseDeDonnees : UPDATE produits SET quantite_stock = ...
+VR -> BaseDeDonnees : COMMIT
+BaseDeDonnees --> VR : OK
+VR --> VS : vente_enregistree
+VS --> VC : confirmation
+VC --> IU : afficher_confirmation
+@enduml
+
+
+
+@startuml
+actor Employe
+participant "interface_utilisateur" as IU
+participant "vente_controller" as VC
+participant "vente_service" as VS
+participant "vente_repository" as VR
+database "BaseDeDonnees"
+
+Employe -> IU : effectuer_vente()
+IU -> VC : lancer_vente(produits)
+VC -> VS : valider_et_enregistrer_vente(produits)
+VS -> VR : enregistrer(vente)
+VR -> BaseDeDonnees : INSERT vente, lignes_vente
+BaseDeDonnees --> VR : OK
+VR --> VS : vente_enregistree
+VS --> VC : confirmation
+VC --> IU : affichage_confirmation
+@enduml

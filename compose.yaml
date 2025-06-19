@@ -1,0 +1,12 @@
+# This file is used to define the services and their configurations for the Docker containers.
+services:
+  web:
+    image: scirelgar/log430-fastapi:lab1
+    container_name: fastapi
+    ports:
+      - "8000:8000"
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+      
