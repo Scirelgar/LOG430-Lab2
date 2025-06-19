@@ -16,10 +16,12 @@ class Controller:
         product_repository: ProductRepository,
         sale_repository: Optional[SaleRepository] = None,
         return_repository: Optional[ReturnRepository] = None,
+        cashier_id: Optional[int] = None,
     ):
         self.product_repository = product_repository
         self.sale_repository = sale_repository
         self.return_repository = return_repository
+        self.cashier_id = cashier_id  # ID de la caisse pour tracer les transactions
         self._cart_items: List[CartItem] = []  # Temporary cart for current transaction
 
     def add_product(self, name, category, price, stock):
@@ -57,14 +59,13 @@ class Controller:
     def process_purchase(self):
         """Process the purchase and create a Sale object"""
         if not self._cart_items or not self.sale_repository:
-            return None
-
-        # Create a new Sale object
+            return None  # Create a new Sale object with cashier information
         sale = Sale(
             sale_date=datetime.now(),
             total_amount=sum(
                 item.quantity * item.unit_price for item in self._cart_items
             ),
+            cashier_id=self.cashier_id,
         )
 
         # Add the sale to the database first to get an ID

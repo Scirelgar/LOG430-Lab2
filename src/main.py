@@ -1,5 +1,7 @@
 import sys
 import os
+import threading
+import argparse
 
 # Add the project root directory to Python path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -15,11 +17,13 @@ from src.repository.product_repository import ProductRepository
 from src.repository.sale_repository import SaleRepository
 from src.repository.return_repository import ReturnRepository
 from src.controller.controller import Controller
+from src.session_manager import session_manager
 
 
 class Menu:
-    def __init__(self, controller: Controller):
+    def __init__(self, controller: Controller, cashier_id: int | None = None):
         self.controller = controller
+        self.cashier_id = cashier_id
         self.current_menu = "main"
         self.running = True
         self.current_sale_id = None  # For returns
@@ -65,13 +69,12 @@ class Menu:
                     "0": lambda: self.change_menu("transactions"),
                 },
             },
-        }
-
-    def change_menu(self, menu_name):
+        }    def change_menu(self, menu_name):
         self.current_menu = menu_name
 
     def display_main_menu(self):
-        print("\n===== Menu Principal =====")
+        cashier_info = f" - Caisse {self.cashier_id}" if self.cashier_id else ""
+        print(f"\n===== Menu Principal{cashier_info} =====")
         print("1. Produits")
         print("2. Transactions")
         print("0. Quitter")

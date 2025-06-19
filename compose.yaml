@@ -1,12 +1,56 @@
-# This file is used to define the services and their configurations for the Docker containers.
+# Configuration pour système multi-caisses
 services:
-  web:
-    image: scirelgar/log430-fastapi:lab1
-    container_name: fastapi
+  # Base de données partagée
+  database:
+    image: postgres:15
+    container_name: pos_database
+    environment:
+      POSTGRES_DB: shopdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
     ports:
-      - "8000:8000"
-
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  # Caisse 1
+  caisse_1:
     build:
       context: .
       dockerfile: Dockerfile
-      
+    container_name: caisse_1
+    environment:
+      CASHIER_ID: "1"
+      DB_HOST: "database"
+    depends_on:
+      - database
+    stdin_open: true
+    tty: true
+  # Caisse 2
+  caisse_2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: caisse_2
+    environment:
+      CASHIER_ID: "2"
+      DB_HOST: "database"
+    depends_on:
+      - database
+    stdin_open: true
+    tty: true
+  # Caisse 3
+  caisse_3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: caisse_3
+    environment:
+      CASHIER_ID: "3"
+      DB_HOST: "database"
+    depends_on:
+      - database
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:
