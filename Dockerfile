@@ -12,4 +12,4 @@ USER app
 # Support pour les caisses multiples
 # Utiliser une variable d'environnement pour spécifier l'ID de caisse
 ENV CASHIER_ID=""
-CMD if [ -n "$CASHIER_ID" ]; then python src/main_multicash.py --cashier-id $CASHIER_ID; else python src/main_multicash.py; fi
+CMD if [ -n "$CASHIER_ID" ]; then python src/main.py --cashier-id $CASHIER_ID; else python src/main.py; fi

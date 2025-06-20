@@ -69,7 +69,9 @@ class Menu:
                     "0": lambda: self.change_menu("transactions"),
                 },
             },
-        }    def change_menu(self, menu_name):
+        }
+
+    def change_menu(self, menu_name):
         self.current_menu = menu_name
 
     def display_main_menu(self):
@@ -298,15 +300,41 @@ class Menu:
 
 
 def main():
-    # Initialize database connection
-    engine = create_engine(
-        "postgresql+psycopg2://postgres:admin@localhost:5432/shopdb",
-        future=True,
-        echo=True,
+    # Parse command line arguments for multi-cash support
+    parser = argparse.ArgumentParser(
+        description="Système de point de vente multi-caisses"
+    )
+    parser.add_argument(
+        "--cashier-id",
+        type=int,
+        choices=[1, 2, 3],
+        help="ID de caisse spécifique (1, 2, ou 3)",
+    )
+    parser.add_argument(
+        "--demo", action="store_true", help="Mode démo avec données de test"
     )
 
-    # Create tables if they don't exist
-    Base.metadata.create_all(engine)
+    args = parser.parse_args()
+
+    # Initialize database connection
+    # Utiliser la variable d'environnement pour l'hôte de la DB (Docker vs local)
+    db_host = os.environ.get("DB_HOST", "localhost")
+    engine = create_engine(
+        f"postgresql+psycopg2://postgres:admin@{db_host}:5432/shopdb",
+        future=True,
+        echo=False,  # Moins de logs pour les caisses multiples
+    )
+
+    # Créer les tables si elles n'existent pas (gestion de la concurrence)
+    try:
+        Base.metadata.create_all(engine, checkfirst=True)
+    except Exception as e:
+        # En cas de concurrence, une autre caisse a peut-être déjà créé les tables
+        if "already exists" in str(e):
+            print(f"ℹ️  Les tables existent déjà (créées par une autre caisse)")
+        else:
+            print(f"⚠️  Erreur lors de la création des tables: {e}")
+            raise e
 
     # Create session
     Session = sessionmaker(bind=engine, future=True)
@@ -317,11 +345,20 @@ def main():
     sale_repo = SaleRepository(session)
     return_repo = ReturnRepository(session)
 
-    # Initialize controller with all repositories
-    controller = Controller(product_repo, sale_repo, return_repo)
+    # Initialize controller with all repositories and cashier ID
+    controller = Controller(
+        product_repo, sale_repo, return_repo, cashier_id=args.cashier_id
+    )
 
-    # Run the menu
-    menu = Menu(controller)
+    # Setup session management for multi-cash system
+    if args.cashier_id:
+        cashier_name = f"Caissier-{args.cashier_id}"
+        session_obj = session_manager.create_session(args.cashier_id, cashier_name)
+        print(f"✅ Session créée pour Caisse {args.cashier_id} - {cashier_name}")
+        print(f"Session ID: {session_obj.session_id}")
+
+    # Run the menu with cashier ID
+    menu = Menu(controller, cashier_id=args.cashier_id)
     menu.run()
 
 
