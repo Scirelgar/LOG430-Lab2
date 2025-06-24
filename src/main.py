@@ -299,7 +299,7 @@ class Menu:
         self.running = False
 
 
-def main():
+def main(argv=None):
     # Parse command line arguments for multi-cash support
     parser = argparse.ArgumentParser(
         description="Système de point de vente multi-caisses"
@@ -314,7 +314,7 @@ def main():
         "--demo", action="store_true", help="Mode démo avec données de test"
     )
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     # Initialize database connection
     # Utiliser la variable d'environnement pour l'hôte de la DB (Docker vs local)
