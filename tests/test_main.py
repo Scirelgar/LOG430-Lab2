@@ -53,9 +53,9 @@ def test_main_function(mock_menu_class, mock_sessionmaker, mock_create_engine):
     mock_create_engine.return_value = mock_engine
     mock_sessionmaker.return_value = mock_session_factory
     mock_session_factory.return_value = mock_session
-    mock_menu_class.return_value = mock_menu
-
-    # We need to import main here to avoid circular imports
+    mock_menu_class.return_value = (
+        mock_menu  # We need to import main here to avoid circular imports
+    )
     from src.main import main
 
     with patch("src.main.Base"):
@@ -64,7 +64,7 @@ def test_main_function(mock_menu_class, mock_sessionmaker, mock_create_engine):
                 with patch("src.main.ReturnRepository"):
                     with patch("src.main.Controller"):
                         # Act
-                        main()
+                        main([])
 
     # Assert
     mock_create_engine.assert_called_once()

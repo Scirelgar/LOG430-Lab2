@@ -11,6 +11,9 @@ class Sale(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     sale_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     total_amount: Mapped[float] = mapped_column(Float, default=0.0)
+    cashier_id: Mapped[int | None] = mapped_column(
+        Integer, nullable=True
+    )  # ID de la caisse
 
     sale_lines: Mapped[list["SaleLine"]] = relationship(
         "SaleLine", back_populates="sale", cascade="all, delete-orphan"
